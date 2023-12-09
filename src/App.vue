@@ -1,5 +1,5 @@
 <template>
-  <div class="header">
+  <!-- <div class="header">
     <span style="letter-spacing: 1px;color: #2c3e50;">DATA Visualization</span>
 
     <div class="zoom-buttons">
@@ -14,7 +14,9 @@
   <div class="zoomed-section" :class="{ grabbing: isDragging }">
     <svg  draggable="true" class="zoom-container" ref="zoomContainer" @wheel.prevent="handleScroll" @mousedown="startDrag"
       @mousemove="handleDrag" @mouseup="stopDrag"></svg>
-  </div>
+  </div> -->
+
+  <svg ref="zoomContainer"></svg>
 </template>
 
 <script setup>
@@ -34,12 +36,12 @@ let dragY = 0;
 const handleZoom = (scaleFactor) => {
   currentScale += scaleFactor;
   zoomContainer.value.style.transform = `scale(${currentScale})`;
-  console.log('currentScale : ', currentScale);
+  console.log("currentScale : ", currentScale);
 };
 const handleZoomOut = (scaleFactor) => {
   currentScale -= scaleFactor;
   zoomContainer.value.style.transform = `scale(${currentScale})`;
-  console.log('currentScale : ', currentScale);
+  console.log("currentScale : ", currentScale);
 };
 const handleScroll = (event) => {
   if (event.ctrlKey) {
@@ -140,7 +142,7 @@ const temp = [];
 console.log(response.length);
 
 for (let i in response) {
-  temp.push({ name: response[i] });
+  temp.push({ name: response[i], type: "type", id: i });
 }
 
 response = temp;
@@ -149,9 +151,7 @@ response = temp;
 const data = ref();
 const svg = ref(null); // Declare svg as a ref
 
-
 onMounted(() => {
-
   // data.value = {
   //   name: "father",
   //   children: [
@@ -257,6 +257,22 @@ onMounted(() => {
     // Update the nodes…
     const node = gNode.selectAll("g").data(nodes, (d) => d.id);
 
+    function toggleChildren(d) {
+      if (!d.children) {
+        // If there are no children or they are hidden, add a new child
+        d.children = [{ name: "New Child" }];
+      } else {
+        // If the node has children, toggle visibility
+        if (d.children) {
+          d._children = d.children;
+          d.children = null;
+        } else {
+          d.children = d._children;
+          d._children = null;
+        }
+      }
+    }
+
     // Enter any new nodes at the parent's previous position.
     const nodeEnter = node
       .enter()
@@ -266,13 +282,23 @@ onMounted(() => {
       .attr("stroke-opacity", 0)
       .on("click", (event, d) => {
         handleClick(d);
-        d.children = d.children ? null : d._children;
-        update(event, d);
+        // d.children = d.children ? null : d._children;
+        console.log(d);
+        // data.value.children[d.data.id].children = [
+        //   { name: "Policies" },
+        //   { name: "Attributes" },
+        //   { name: "Relations" },
+        // ];
+        update(null, d);
       });
 
     // Custom click function
     function handleClick(nodeData) {
-      console.log("Node clicked:", nodeData.data.name);
+      console.log("Node clicked:", nodeData.data.id);
+
+      console.log(data.value.children[nodeData.data.id]);
+      toggleChildren(nodeData);
+      // update(null, root);
       // Add your custom logic here
       // For example, you can open a modal, navigate to a different page, etc.
     }
@@ -356,12 +382,11 @@ onMounted(() => {
 
   update(null, root);
 
-  d3.select('.zoom-buttons')
-    .style('position', 'absolute')
-    .style('bottom', '10px')
-    .style('right', '10px');
+  d3.select(".zoom-buttons")
+    .style("position", "absolute")
+    .style("bottom", "10px")
+    .style("right", "10px");
   // ... (existing code)
-
 
   return svg.node();
 });
