@@ -1,6 +1,6 @@
 <template>
   <div class="header">
-    <span style="letter-spacing: 1px; color: #2c3e50">DATA Visualization</span>
+    <span style="letter-spacing: 1px; color: #2c3e50">Schema Visualization</span>
 
     <!-- <div class="zoom-buttons">
       <div
