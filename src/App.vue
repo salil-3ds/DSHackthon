@@ -1,6 +1,6 @@
 <template>
   <div class="header">
-    <span style="letter-spacing: 1px;color: #2c3e50;">DATA Visualization</span>
+    <span style="letter-spacing: 1px; color: #2c3e50">DATA Visualization</span>
 
     <!-- <div class="zoom-buttons">
       <div
@@ -14,7 +14,12 @@
   <div class="zoomed-section" :class="{ grabbing: isDragging }">
     <!-- <svg  draggable="true" class="zoom-container" ref="zoomContainer" @wheel.prevent="handleScroll" @mousedown="startDrag"
       @mousemove="handleDrag" @mouseup="stopDrag"></svg> -->
-    <svg @mousedown="startDrag" @mousemove="handleDrag" @mouseup="stopDrag" ref="zoomContainer"></svg>
+    <svg
+      @mousedown="startDrag"
+      @mousemove="handleDrag"
+      @mouseup="stopDrag"
+      ref="zoomContainer"
+    ></svg>
   </div>
 </template>
 
@@ -32,17 +37,17 @@ let dragStartX = 0;
 let dragStartY = 0;
 let dragX = 0;
 let dragY = 0;
-console.log('isDragging : ', isDragging);
+// console.log('isDragging : ', isDragging);
 
 const handleZoom = (scaleFactor) => {
   currentScale += scaleFactor;
   zoomContainer.value.style.transform = `scale(${currentScale})`;
-  console.log('currentScale : ', currentScale);
+  console.log("currentScale : ", currentScale);
 };
 const handleZoomOut = (scaleFactor) => {
   currentScale -= scaleFactor;
   zoomContainer.value.style.transform = `scale(${currentScale})`;
-  console.log('currentScale : ', currentScale);
+  console.log("currentScale : ", currentScale);
 };
 const handleScroll = (event) => {
   if (event.ctrlKey) {
@@ -52,7 +57,7 @@ const handleScroll = (event) => {
 
 const startDrag = (event) => {
   isDragging = true;
-  console.log('isDragging : ', isDragging);
+  console.log("isDragging : ", isDragging);
   dragStartX = event.clientX;
   dragStartY = event.clientY;
 };
@@ -71,92 +76,30 @@ const handleDrag = (event) => {
 
 const stopDrag = () => {
   isDragging = false;
-  console.log('isDragging : ', isDragging);
+  console.log("isDragging : ", isDragging);
 };
 
 const updateTransform = () => {
   zoomContainer.value.style.transform = `scale(${currentScale}%) translate(${dragX}px, ${dragY}px)`;
 };
 
-let response = `AecBuildingElementPart
-Appliance Product Part
-Application Part
-Assembled Product Part
-BridgePart
-Closure Part
-Compliance Enterprise Part
-Compliance Plant Specific Part
-Compliance Reported Part
-Compliance Subtier Part
-Consumer Kit Part
-Consumer Unit Part
-DELSerializedLotContinuousProvidedPart
-DELSerializedLotManufacturedPart
-DELSerializedLotProvidedPart
-DELSerializedUnitManufacturedPart
-DELSerializedUnitProvidedPart
-DamPart
-Display Unit Part
-DrainagePart
-Electrical Part
-EnsLogicalPart
-Finished Product Part
-Formulation Part
-GeoMineSurfacePart
-GeologyModelPart
-GeologyPart
-HVAC_Logical_Part
-HVAC_Part
-Handling Unit Part
-Hardware Part
-Kit Part
-Label Part
-Manufacturing Part
-MarinePart
-Material Part
-Mechanical Part
-Packaging Assembly Part
-Packaging Component Part
-Packaging Material Part
-Pallet Part
-Part
-Phantom Part
-Piping_Logical_Part
-Piping_Part
-Product Data Part
-Raceway_Part
-RailwayPart
-RoadPart
-SOECoveringPart
-SOESystemPart
-Semi-Finished Product Part
-Software Part
-SubgradePart
-Supplier Equivalent Part
-Support Part
-Synthetic Part
-Tool Part
-Trade Unit Part
-Transport Unit Part
-TunnelPart`;
+// let response = ``;
 
-response = response.split("\n");
-const temp = [];
-console.log(response.length);
+// response = response.split("\n");
+// const temp = [];
+// console.log(response.length);
 
-for (let i in response) {
-  temp.push({ name: response[i] });
-}
+// for (let i in response) {
+//   temp.push({ name: response[i] });
+// }
 
-response = temp;
+// response = temp;
 // temp = undefined;
 
 const data = ref();
 const svg = ref(null); // Declare svg as a ref
 
-
 onMounted(() => {
-
   // data.value = {
   //   name: "father",
   //   children: [
@@ -170,25 +113,104 @@ onMounted(() => {
   //     },
   //   ],
   // };
+  function splitToList(list) {
+    list = list.split("|");
+    var tmp = [];
+    for (let i in list) {
+      tmp.push({
+        name: list[i],
+      });
+    }
+    return tmp;
+  }
+
+  var toRel = splitToList(
+    `Customer Design|Internal Design|CoOwned|Image Holder|Decision Applies To|UPR_LinkToResourceAbstract|Reference Document|Collection Content|DEL3DL_Link|Issue|EQUIVALENT|DERIVED_ABSTRACT|Assigned Apps|Risk Affected Items|VPLMrel/VPMSemanticRelation/C_Owner|VPLMrel/VPMPathElement/C_Owner|VPLMrel/VPMSemanticRelation|WSParentReserve|Resolved To|OntoRootRel|OntoRange|OntoRootOwns|Configuration Item|First Configuration Item|Agenda Item|Additional Context|DELIsFilteredBy|Criteria Output|UKConstrained|Subscribed Item|Candidate Affected Item|Change Affected Item|Implemented Item|Related Item|Vaulted Objects|Task Deliverable|Message Attachments|Meeting Attachments|Workflow Content|Folder Document|Assigned Documents|Vaulted Documents Rev2|Document Structure|Part Family Reference Document|Build Specification|Features Specification|Product Specification|Requirement Specification|Company Documents|Retained Record|Characteristic Test Method|SpecificationDocument|PLMResourceSetSubItemResource|CDMReferenceDocument|Active Version|Latest Version|Reported Against EC|Contains|Has Documents|Requested Document|Document Usage|Download Document|Classified Item|Sourcing Document|Favourite Of`
+  );
+
+  var fromRel = splitToList(
+    `|Markup|Pending Job|ParameterAggregation|Sharing Access|DEL3DL_Link|Checklist|Configuration Context|EQUIVALENT|DERIVED_ABSTRACT|Root Questionnaire|Related Item Questionnaire|Contributes To|Publish Subscribe|VPLMrel/VPMSemanticRelation|Thread|Meeting Context|WSLocalReserve|OntoRootRel|ParameterUsage|isVersionOf|ParameterComposition|VPLMInteg-VPLMProjection|SpecificationDocument|hasViews|Informed User|Template|Performance Specification|Performance Specification Reference|UKConstrained|Effort|Object Route|Reference Document|Document Structure|Active Version|Latest Version|IEFComments|Document Sheets|Version `
+  );
+
+  // tmp.length = 0;
 
   data.value = {
     name: "Schema",
-    children: response,
+    children: [
+      { name: "Compound Document" },
+      { name: "Data Document" },
+      { name: "DmtDocument" },
+      {
+        name: "Document",
+        children: [
+          {
+            name: "Policies",
+            children: [{ name: "Document Release" }, { name: "Version" }],
+          },
+          {
+            name: "Attributes",
+            children: [
+              { name: "clau" },
+              { name: "Designated User" },
+              { name: "Access Type" },
+              { name: "Checkin Reason" },
+              { name: "Language" },
+              { name: "Is Version Object" },
+              { name: "Move Files To Version" },
+              { name: "Suspend Versioning" },
+              { name: "File Created Date" },
+              { name: "File Dimension" },
+              { name: "File Duration" },
+              { name: "File Modified Date" },
+              { name: "File Size" },
+              { name: "File Type" },
+              { name: "Originator" },
+              { name: "Title" },
+              { name: "Version" },
+              { name: "File Version" },
+              { name: "Version Date" },
+              { name: "Secondary Keys" },
+              { name: "CAD Type" },
+              { name: "Primary Key" },
+            ],
+          },
+          {
+            name: "Relationships",
+            children: [
+              { name: "From Relation", children: fromRel },
+              { name: "To Relation", children: toRel },
+            ],
+          },
+          { name: "Triggers" },
+        ],
+      },
+      { name: "Generic Document" },
+      { name: "MS Excel Document" },
+      { name: "MS Outlook Document" },
+      { name: "MS Powerpoint Document" },
+      { name: "MS Word Document" },
+      { name: "Office Document" },
+      { name: "Quality System Document" },
+      { name: "Report Document" },
+      { name: "Technical Document" },
+      { name: "Version Document" },
+      { name: "dsc_Simulation_Document" },
+    ],
   };
 
   // Specify the charts’ dimensions. The height is variable, depending on the layout.
-  const width = 928;
+  const width = 1600;
   const marginTop = 10;
   const marginRight = 10;
   const marginBottom = 10;
-  const marginLeft = 40;
+  const marginLeft = 80;
 
   // Rows are separated by dx pixels, columns by dy pixels. These names can be counter-intuitive
   // (dx is a height, and dy a width). This because the tree must be viewed with the root at the
   // “bottom”, in the data domain. The width of a column is based on the tree’s height.
   const root = d3.hierarchy(data.value);
   const dx = 30;
-  const dy = (width - marginRight - marginLeft) / (1 + root.height);
+  const dy = (width - marginRight - marginLeft) / (1 + root.height) + 30;
 
   // Define the tree layout and the shape for links.
   const tree = d3.tree().nodeSize([dx, dy]);
@@ -206,7 +228,7 @@ onMounted(() => {
     .attr("viewBox", [-marginLeft, -marginTop, width, dx])
     .attr(
       "style",
-      "max-width: 100%; height: auto; font: 13px sans-serif; user-select: none;"
+      "max-width: 100%; height: auto; font: 15px sans-serif; user-select: none;"
     );
 
   const gLink = svg
@@ -222,7 +244,7 @@ onMounted(() => {
     .attr("pointer-events", "all");
 
   function update(event, source) {
-    const duration = event?.altKey ? 2500 : 250; // hold the alt key to slow down the transition
+    const duration = event?.altKey ? 3500 : 350; // hold the alt key to slow down the transition
     const nodes = root.descendants().reverse();
     const links = root.links();
 
@@ -350,12 +372,11 @@ onMounted(() => {
 
   update(null, root);
 
-  d3.select('.zoom-buttons')
-    .style('position', 'absolute')
-    .style('bottom', '10px')
-    .style('right', '10px');
+  d3.select(".zoom-buttons")
+    .style("position", "absolute")
+    .style("bottom", "10px")
+    .style("right", "10px");
   // ... (existing code)
-
 
   return svg.node();
 });
