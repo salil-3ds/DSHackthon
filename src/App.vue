@@ -1,22 +1,21 @@
 <template>
-  <!-- <div class="header">
+  <div class="header">
     <span style="letter-spacing: 1px;color: #2c3e50;">DATA Visualization</span>
 
-    <div class="zoom-buttons">
+    <!-- <div class="zoom-buttons">
       <div
         style="height: 20px; width:50px; color: #2c3e50; border: 1px solid #ccc; display: flex; justify-content: center;align-items: center; cursor: pointer; background-color: #ffffff;"
         @click="handleZoom(1.2)">+</div>
       <div
         style="height: 20px; width:50px; color: #2c3e50; border: 1px solid #ccc; display: flex; justify-content: center;align-items: center; cursor: pointer; background-color: #ffffff;"
         @click="handleZoomOut(0.8)">-</div>
-    </div>
+    </div> -->
   </div>
   <div class="zoomed-section" :class="{ grabbing: isDragging }">
-    <svg  draggable="true" class="zoom-container" ref="zoomContainer" @wheel.prevent="handleScroll" @mousedown="startDrag"
-      @mousemove="handleDrag" @mouseup="stopDrag"></svg>
-  </div> -->
-
-  <svg ref="zoomContainer"></svg>
+    <!-- <svg  draggable="true" class="zoom-container" ref="zoomContainer" @wheel.prevent="handleScroll" @mousedown="startDrag"
+      @mousemove="handleDrag" @mouseup="stopDrag"></svg> -->
+    <svg @mousedown="startDrag" @mousemove="handleDrag" @mouseup="stopDrag" ref="zoomContainer"></svg>
+  </div>
 </template>
 
 <script setup>
@@ -33,15 +32,17 @@ let dragStartX = 0;
 let dragStartY = 0;
 let dragX = 0;
 let dragY = 0;
+console.log('isDragging : ', isDragging);
+
 const handleZoom = (scaleFactor) => {
   currentScale += scaleFactor;
   zoomContainer.value.style.transform = `scale(${currentScale})`;
-  console.log("currentScale : ", currentScale);
+  console.log('currentScale : ', currentScale);
 };
 const handleZoomOut = (scaleFactor) => {
   currentScale -= scaleFactor;
   zoomContainer.value.style.transform = `scale(${currentScale})`;
-  console.log("currentScale : ", currentScale);
+  console.log('currentScale : ', currentScale);
 };
 const handleScroll = (event) => {
   if (event.ctrlKey) {
@@ -51,6 +52,7 @@ const handleScroll = (event) => {
 
 const startDrag = (event) => {
   isDragging = true;
+  console.log('isDragging : ', isDragging);
   dragStartX = event.clientX;
   dragStartY = event.clientY;
 };
@@ -69,6 +71,7 @@ const handleDrag = (event) => {
 
 const stopDrag = () => {
   isDragging = false;
+  console.log('isDragging : ', isDragging);
 };
 
 const updateTransform = () => {
@@ -142,7 +145,7 @@ const temp = [];
 console.log(response.length);
 
 for (let i in response) {
-  temp.push({ name: response[i], type: "type", id: i });
+  temp.push({ name: response[i] });
 }
 
 response = temp;
@@ -151,7 +154,9 @@ response = temp;
 const data = ref();
 const svg = ref(null); // Declare svg as a ref
 
+
 onMounted(() => {
+
   // data.value = {
   //   name: "father",
   //   children: [
@@ -204,17 +209,6 @@ onMounted(() => {
       "max-width: 100%; height: auto; font: 13px sans-serif; user-select: none;"
     );
 
-  // const svg = d3
-  //   .select(this.$refs.chartContainer)
-  //   // .selectAll("svg")
-  //   .attr("width", width)
-  //   .attr("height", dx)
-  //   .attr("viewBox", [-marginLeft, -marginTop, width, dx])
-  //   .attr(
-  //     "style",
-  //     "max-width: 100%; height: auto; font: 10px sans-serif; user-select: none;"
-  //   );
-
   const gLink = svg
     .append("g")
     .attr("fill", "none")
@@ -257,22 +251,6 @@ onMounted(() => {
     // Update the nodes…
     const node = gNode.selectAll("g").data(nodes, (d) => d.id);
 
-    function toggleChildren(d) {
-      if (!d.children) {
-        // If there are no children or they are hidden, add a new child
-        d.children = [{ name: "New Child" }];
-      } else {
-        // If the node has children, toggle visibility
-        if (d.children) {
-          d._children = d.children;
-          d.children = null;
-        } else {
-          d.children = d._children;
-          d._children = null;
-        }
-      }
-    }
-
     // Enter any new nodes at the parent's previous position.
     const nodeEnter = node
       .enter()
@@ -282,23 +260,13 @@ onMounted(() => {
       .attr("stroke-opacity", 0)
       .on("click", (event, d) => {
         handleClick(d);
-        // d.children = d.children ? null : d._children;
-        console.log(d);
-        // data.value.children[d.data.id].children = [
-        //   { name: "Policies" },
-        //   { name: "Attributes" },
-        //   { name: "Relations" },
-        // ];
-        update(null, d);
+        d.children = d.children ? null : d._children;
+        update(event, d);
       });
 
     // Custom click function
     function handleClick(nodeData) {
-      console.log("Node clicked:", nodeData.data.id);
-
-      console.log(data.value.children[nodeData.data.id]);
-      toggleChildren(nodeData);
-      // update(null, root);
+      console.log("Node clicked:", nodeData.data.name);
       // Add your custom logic here
       // For example, you can open a modal, navigate to a different page, etc.
     }
@@ -382,11 +350,12 @@ onMounted(() => {
 
   update(null, root);
 
-  d3.select(".zoom-buttons")
-    .style("position", "absolute")
-    .style("bottom", "10px")
-    .style("right", "10px");
+  d3.select('.zoom-buttons')
+    .style('position', 'absolute')
+    .style('bottom', '10px')
+    .style('right', '10px');
   // ... (existing code)
+
 
   return svg.node();
 });
@@ -419,8 +388,8 @@ onMounted(() => {
 }
 
 .zoom-buttons {
-  width: 120px;
   /* border: 2px solid red; */
+  width: 120px;
   position: sticky;
   bottom: 10px;
   right: 10px;
@@ -430,18 +399,20 @@ onMounted(() => {
 }
 
 .zoom-container {
+  /* border: 2px solid red; */
   overflow: hidden;
   width: 100vw;
   height: 100vh;
-  position: relative;
+  /* position: relative; */
   transition: transform 0.5s ease-in-out;
 }
 
 .zoomed-section {
   /* border: 2px solid red; */
+  /* height: 100%; */
   width: 100%;
   /* Adjust width as needed */
-  height: 100vh;
+  /* height: 100vh; */
   /* Adjust height as needed */
   /* background-color: lightblue; */
   transform-origin: top right;
