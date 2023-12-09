@@ -1,5 +1,20 @@
 <template>
-  <svg ref="chartContainer"></svg>
+  <div class="header">
+    <span style="letter-spacing: 1px;color: #2c3e50;">DATA Visualization</span>
+
+    <div class="zoom-buttons">
+      <div
+        style="height: 20px; width:50px; color: #2c3e50; border: 1px solid #ccc; display: flex; justify-content: center;align-items: center; cursor: pointer; background-color: #ffffff;"
+        @click="handleZoom(1.2)">+</div>
+      <div
+        style="height: 20px; width:50px; color: #2c3e50; border: 1px solid #ccc; display: flex; justify-content: center;align-items: center; cursor: pointer; background-color: #ffffff;"
+        @click="handleZoomOut(0.8)">-</div>
+    </div>
+  </div>
+  <div class="zoomed-section" :class="{ grabbing: isDragging }">
+    <svg  draggable="true" class="zoom-container" ref="zoomContainer" @wheel.prevent="handleScroll" @mousedown="startDrag"
+      @mousemove="handleDrag" @mouseup="stopDrag"></svg>
+  </div>
 </template>
 
 <script setup>
@@ -9,6 +24,54 @@ import * as d3 from "d3";
 // import HelloWorld from './components/HelloWorld.vue'
 
 import { ref, onMounted } from "vue";
+const zoomContainer = ref(null);
+let currentScale = 100;
+let isDragging = false;
+let dragStartX = 0;
+let dragStartY = 0;
+let dragX = 0;
+let dragY = 0;
+const handleZoom = (scaleFactor) => {
+  currentScale += scaleFactor;
+  zoomContainer.value.style.transform = `scale(${currentScale})`;
+  console.log('currentScale : ', currentScale);
+};
+const handleZoomOut = (scaleFactor) => {
+  currentScale -= scaleFactor;
+  zoomContainer.value.style.transform = `scale(${currentScale})`;
+  console.log('currentScale : ', currentScale);
+};
+const handleScroll = (event) => {
+  if (event.ctrlKey) {
+    event.deltaY > 0 ? handleZoom(0.8) : handleZoom(1.2);
+  }
+};
+
+const startDrag = (event) => {
+  isDragging = true;
+  dragStartX = event.clientX;
+  dragStartY = event.clientY;
+};
+
+const handleDrag = (event) => {
+  if (isDragging) {
+    const deltaX = event.clientX - dragStartX;
+    const deltaY = event.clientY - dragStartY;
+    dragX += deltaX;
+    dragY += deltaY;
+    dragStartX = event.clientX;
+    dragStartY = event.clientY;
+    updateTransform();
+  }
+};
+
+const stopDrag = () => {
+  isDragging = false;
+};
+
+const updateTransform = () => {
+  zoomContainer.value.style.transform = `scale(${currentScale}%) translate(${dragX}px, ${dragY}px)`;
+};
 
 let response = `AecBuildingElementPart
 Appliance Product Part
@@ -84,9 +147,11 @@ response = temp;
 // temp = undefined;
 
 const data = ref();
+const svg = ref(null); // Declare svg as a ref
+
 
 onMounted(() => {
-  // console.log(this.$refs.chartContainer);
+
   // data.value = {
   //   name: "father",
   //   children: [
@@ -100,9 +165,6 @@ onMounted(() => {
   //     },
   //   ],
   // };
-  const method = () => {
-    console.log("this is executed!");
-  };
 
   data.value = {
     name: "Schema",
@@ -131,6 +193,7 @@ onMounted(() => {
     .y((d) => d.x);
 
   // Create the SVG container, a layer for the links and a layer for the nodes.
+
   const svg = d3
     .select("svg")
     .attr("width", width)
@@ -202,10 +265,17 @@ onMounted(() => {
       .attr("fill-opacity", 0)
       .attr("stroke-opacity", 0)
       .on("click", (event, d) => {
+        handleClick(d);
         d.children = d.children ? null : d._children;
         update(event, d);
       });
 
+    // Custom click function
+    function handleClick(nodeData) {
+      console.log("Node clicked:", nodeData.data.name);
+      // Add your custom logic here
+      // For example, you can open a modal, navigate to a different page, etc.
+    }
     nodeEnter
       .append("circle")
       .attr("r", 2.5)
@@ -286,6 +356,13 @@ onMounted(() => {
 
   update(null, root);
 
+  d3.select('.zoom-buttons')
+    .style('position', 'absolute')
+    .style('bottom', '10px')
+    .style('right', '10px');
+  // ... (existing code)
+
+
   return svg.node();
 });
 </script>
@@ -297,6 +374,62 @@ onMounted(() => {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+}
+
+.header {
+  border: 2px solid #ccc;
+  height: 50px;
+  width: 100vw;
+  color: #bd34d1;
+  letter-spacing: normal;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: medium;
+  padding-left: 10px;
+  background-color: #ffffff;
+  margin-bottom: 10px;
+}
+
+.zoom-buttons {
+  width: 120px;
+  /* border: 2px solid red; */
+  position: sticky;
+  bottom: 10px;
+  right: 10px;
+  z-index: 999;
+  display: flex;
+  justify-content: space-around;
+}
+
+.zoom-container {
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  transition: transform 0.5s ease-in-out;
+}
+
+.zoomed-section {
+  /* border: 2px solid red; */
+  width: 100%;
+  /* Adjust width as needed */
+  height: 100vh;
+  /* Adjust height as needed */
+  /* background-color: lightblue; */
+  transform-origin: top right;
+  cursor: grab;
+  overflow: hidden;
+}
+
+.zoom-container {
+  cursor: grab;
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  transition: transform 0.5s ease-in-out;
 }
 </style>
